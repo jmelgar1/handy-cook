@@ -151,8 +151,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   categoryChipActive: {
-    backgroundColor: '#22c55e',
-    borderColor: '#22c55e',
+    backgroundColor: '#AA4A44',
+    borderColor: '#AA4A44',
   },
   categoryChipText: {
     color: '#6b7280',
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   addButton: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#AA4A44',
     margin: 16,
     padding: 16,
     borderRadius: 12,

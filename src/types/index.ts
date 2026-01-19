@@ -80,6 +80,9 @@ export type UserRecipeProgress = {
   notes?: string;
 };
 
+// Camera types
+export type CameraMode = 'barcode' | 'photo' | 'video' | 'scan';
+
 // Scan types
 export type ScanResult = {
   type: 'barcode' | 'image';
@@ -95,6 +98,9 @@ export type ScannedProduct = {
   barcode?: string;
   imageUrl?: string;
 };
+
+// Re-export detection types
+export * from './detection';
 
 // API response types
 export type ApiResponse<T> = {

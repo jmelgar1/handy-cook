@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   signInButton: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#AA4A44',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#22c55e',
+    color: '#AA4A44',
   },
   statLabel: {
     fontSize: 12,

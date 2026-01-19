@@ -36,7 +36,7 @@ export function UnlockProgress({
             styles.progressFill,
             {
               width: `${Math.min(progress, 100)}%`,
-              backgroundColor: isUnlocked ? '#22c55e' : '#fbbf24',
+              backgroundColor: isUnlocked ? '#AA4A44' : '#fbbf24',
             },
           ]}
         />

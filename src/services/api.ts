@@ -126,3 +126,121 @@ export const userApi = {
   updateProfile: (profile: unknown) => api.put('/user/profile', profile),
   getProgress: () => api.get('/user/progress'),
 };
+
+// Classification API (separate Lambda endpoint)
+const CLASSIFICATION_API_URL =
+  process.env.EXPO_PUBLIC_CLASSIFICATION_API_URL ||
+  'https://yw5sawdijk.execute-api.us-east-1.amazonaws.com/default';
+
+export type USDAMetadata = {
+  fdcId: number;
+  description: string;
+  dataType: 'Foundation' | 'SR Legacy';
+  foodCategory: string;
+};
+
+export type ClassificationResult = {
+  isFood: boolean;
+  category: string | null;
+  source: 'usda' | 'usda_no_match' | 'cached' | 'usda_error';
+  confidence: number;
+  usda?: USDAMetadata | null;
+};
+
+export type WordListResponse = {
+  foodWords: Record<string, string[]>;
+  nonFoodWords: string[];
+  genericWords: string[];
+  version: string;
+};
+
+export type ClassifyWordsResponse = {
+  classifications: Record<string, ClassificationResult>;
+};
+
+export const classificationApi = {
+  /**
+   * Get all word lists for local caching
+   * GET /words
+   */
+  getWordsList: async (): Promise<WordListResponse> => {
+    const response = await fetch(`${CLASSIFICATION_API_URL}/words`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch word lists: ${response.status}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Classify unknown words using USDA Foundation foods
+   * POST /classify
+   */
+  classifyWords: async (
+    words: string[]
+  ): Promise<Record<string, ClassificationResult>> => {
+    const response = await fetch(`${CLASSIFICATION_API_URL}/classify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ words }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to classify words: ${response.status}`);
+    }
+    const data: ClassifyWordsResponse = await response.json();
+    return data.classifications;
+  },
+
+  /**
+   * Send feedback on classification accuracy
+   * POST /feedback
+   */
+  sendFeedback: async (word: string, accepted: boolean): Promise<void> => {
+    const response = await fetch(`${CLASSIFICATION_API_URL}/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word, accepted }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to send feedback: ${response.status}`);
+    }
+  },
+};
+
+// OCR Correction API Types
+export type FoodTerm = {
+  term: string;
+  confidence: number;
+  category: string;
+};
+
+export type CorrectOCRRequest = {
+  ocrText: string;
+  logoTexts?: string[];
+};
+
+export type CorrectOCRResponse = {
+  foodTerms: FoodTerm[];
+  brandName: string | null;
+  productName: string | null;
+  cached: boolean;
+  source: 'llm' | 'cache' | 'fallback';
+  processingTime: number;
+};
+
+export const correctionApi = {
+  /**
+   * Correct OCR text using Claude Haiku LLM
+   * POST /correct-ocr
+   */
+  correctOCR: async (input: CorrectOCRRequest): Promise<CorrectOCRResponse> => {
+    const response = await fetch(`${CLASSIFICATION_API_URL}/correct-ocr`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to correct OCR: ${response.status}`);
+    }
+    return response.json();
+  },
+};

@@ -1,0 +1,23 @@
+{
+  "name": "handycook-lambda",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Lambda functions for HandyCook food classification",
+  "scripts": {
+    "build": "sam build",
+    "deploy": "sam deploy",
+    "deploy:guided": "sam deploy --guided",
+    "local": "sam local start-api",
+    "logs:classify": "sam logs -n ClassifyWordsFunction --stack-name handycook-api --tail",
+    "logs:words": "sam logs -n GetWordsListFunction --stack-name handycook-api --tail",
+    "logs:feedback": "sam logs -n WordsFeedbackFunction --stack-name handycook-api --tail",
+    "logs:ocr": "sam logs -n CorrectOCRFunction --stack-name handycook-api --tail",
+    "seed": "node scripts/seedDatabase.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@aws-sdk/client-dynamodb": "^3.500.0",
+    "@aws-sdk/lib-dynamodb": "^3.500.0",
+    "@aws-sdk/util-dynamodb": "^3.500.0"
+  }
+}

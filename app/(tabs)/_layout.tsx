@@ -1,83 +1,57 @@
-import { Tabs } from 'expo-router';
-import { Text, View } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SwipeableTabView, TabConfig } from '@/components/SwipeableTabView';
 
-type TabIconProps = {
-  focused: boolean;
-  label: string;
-  emoji: string;
-};
+// Import screen components directly
+import RecipesScreen from './recipes';
+import PantryScreen from './pantry';
+import CameraScreen from './index';
+import ProfileScreen from './profile';
+import SettingsScreen from './settings';
 
-function TabIcon({ focused, label, emoji }: TabIconProps) {
+// Tab configuration
+const TABS: TabConfig[] = [
+  { key: 'recipes', title: 'Recipes', emoji: '📖', component: RecipesScreen },
+  { key: 'pantry', title: 'Pantry', emoji: '🥫', component: PantryScreen },
+  { key: 'camera', title: 'Camera', emoji: '📷', component: CameraScreen },
+  { key: 'profile', title: 'Profile', emoji: '👤', component: ProfileScreen },
+  { key: 'settings', title: 'Settings', emoji: '⚙️', component: SettingsScreen },
+];
+
+// Header component for non-camera screens
+function Header({ title }: { title: string }) {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontSize: 24 }}>{emoji}</Text>
-      <Text
-        style={{
-          fontSize: 10,
-          color: focused ? '#22c55e' : '#6b7280',
-          fontWeight: focused ? '600' : '400',
-        }}
-      >
-        {label}
-      </Text>
+    <View style={[styles.header, { paddingTop: insets.top }]}>
+      <Text style={styles.headerTitle}>{title}</Text>
     </View>
   );
 }
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarShowLabel: false,
-        tabBarStyle: {
-          height: 70,
-          paddingTop: 8,
-          paddingBottom: 8,
-        },
-        headerStyle: {
-          backgroundColor: '#22c55e',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Home" emoji="🏠" />,
-        }}
-      />
-      <Tabs.Screen
-        name="recipes"
-        options={{
-          title: 'Recipes',
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Recipes" emoji="📖" />,
-        }}
-      />
-      <Tabs.Screen
-        name="scan"
-        options={{
-          title: 'Scan',
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Scan" emoji="📷" />,
-        }}
-      />
-      <Tabs.Screen
-        name="pantry"
-        options={{
-          title: 'Pantry',
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Pantry" emoji="🥫" />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Profile" emoji="👤" />,
-        }}
-      />
-    </Tabs>
+    <View style={styles.container}>
+      <StatusBar style="light" />
+      <SwipeableTabView tabs={TABS} initialIndex={2} />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  header: {
+    backgroundColor: '#AA4A44',
+    paddingBottom: 16,
+    paddingHorizontal: 16,
+  },
+  headerTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+});

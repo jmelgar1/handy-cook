@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     borderColor: '#e5e7eb',
   },
   submitButton: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#AA4A44',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   backButton: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#AA4A44',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',

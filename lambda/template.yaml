@@ -1,0 +1,171 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: HandyCook API - Food word classification and management
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+  UsdaApiKey:
+    Type: String
+    NoEcho: true
+    Description: USDA Food Data Central API key
+  SpoonacularApiKey:
+    Type: String
+    NoEcho: true
+    Description: Spoonacular API key
+  AnthropicApiKey:
+    Type: String
+    NoEcho: true
+    Description: Anthropic API key for Claude Haiku OCR correction
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 30
+    MemorySize: 256
+    Environment:
+      Variables:
+        DYNAMODB_TABLE: !Ref FoodWordsTable
+        USDA_API_KEY: !Ref UsdaApiKey
+        SPOONACULAR_API_KEY: !Ref SpoonacularApiKey
+    Architectures:
+      - x86_64
+
+Resources:
+  # API Gateway
+  HandyCookApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+
+  # DynamoDB Table
+  FoodWordsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub food_words_${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      Tags:
+        - Key: Application
+          Value: HandyCook
+        - Key: Environment
+          Value: !Ref Environment
+
+  # Lambda Functions
+  ClassifyWordsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub handycook-classify-words-${Environment}
+      CodeUri: functions/classifyWords/
+      Handler: index.handler
+      Description: Classify food words using USDA and Spoonacular APIs
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FoodWordsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HandyCookApi
+            Path: /classify
+            Method: POST
+
+  GetWordsListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub handycook-get-words-${Environment}
+      CodeUri: functions/getWordsList/
+      Handler: index.handler
+      Description: Get all classified food words
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref FoodWordsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HandyCookApi
+            Path: /words
+            Method: GET
+
+  WordsFeedbackFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub handycook-words-feedback-${Environment}
+      CodeUri: functions/wordsFeedback/
+      Handler: index.handler
+      Description: Record user feedback on word classifications
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FoodWordsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HandyCookApi
+            Path: /feedback
+            Method: POST
+
+  CorrectOCRFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub handycook-correct-ocr-${Environment}
+      CodeUri: functions/correctOCR/
+      Handler: index.handler
+      Description: Correct OCR text using Claude Haiku LLM
+      Environment:
+        Variables:
+          ANTHROPIC_API_KEY: !Ref AnthropicApiKey
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FoodWordsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HandyCookApi
+            Path: /correct-ocr
+            Method: POST
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${HandyCookApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}
+
+  ClassifyEndpoint:
+    Description: Classify words endpoint
+    Value: !Sub https://${HandyCookApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/classify
+
+  WordsEndpoint:
+    Description: Get words list endpoint
+    Value: !Sub https://${HandyCookApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/words
+
+  FeedbackEndpoint:
+    Description: Feedback endpoint
+    Value: !Sub https://${HandyCookApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/feedback
+
+  CorrectOCREndpoint:
+    Description: OCR correction endpoint
+    Value: !Sub https://${HandyCookApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/correct-ocr
+
+  DynamoDBTableName:
+    Description: DynamoDB table name
+    Value: !Ref FoodWordsTable

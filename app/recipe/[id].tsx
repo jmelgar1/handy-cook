@@ -185,11 +185,11 @@ const styles = StyleSheet.create({
   },
   unlockCard: {
     marginHorizontal: 16,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: '#fef2f2',
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#bbf7d0',
+    borderColor: '#fecaca',
   },
   unlockHeader: {
     flexDirection: 'row',
@@ -199,26 +199,26 @@ const styles = StyleSheet.create({
   unlockTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#166534',
+    color: '#991b1b',
   },
   unlockCount: {
     fontSize: 14,
-    color: '#166534',
+    color: '#991b1b',
   },
   progressBar: {
     height: 8,
-    backgroundColor: '#dcfce7',
+    backgroundColor: '#fee2e2',
     borderRadius: 4,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#22c55e',
+    backgroundColor: '#AA4A44',
     borderRadius: 4,
   },
   unlockHint: {
     fontSize: 13,
-    color: '#166534',
+    color: '#991b1b',
     marginTop: 8,
   },
   section: {
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   ingredientCheck: {
     fontSize: 18,
     width: 30,
-    color: '#22c55e',
+    color: '#AA4A44',
   },
   ingredientText: {
     flex: 1,
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     fontSize: 13,
-    color: '#22c55e',
+    color: '#AA4A44',
     fontWeight: '500',
   },
   stepRow: {
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#22c55e',
+    backgroundColor: '#AA4A44',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: '#22c55e',
+    backgroundColor: '#AA4A44',
     alignItems: 'center',
   },
   cookButtonDisabled: {
